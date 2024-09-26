@@ -83,7 +83,14 @@ public:
     bool checkWin(char disc) {
         return isRowWin(disc) || isColWin(disc) || isDiagonalWin(disc);
     }
-
+    bool isBoardFull() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (brd[i][j] == ' ') return false;
+            }
+            return true;
+        }
+    }
 };
 class Player {
 public:
@@ -116,6 +123,10 @@ public:
                 cout<< player.name<<" wins!";
                 gameOver=true;
             }
+            if (board.isBoardFull()) {
+                cout << "the board is full, the game is finised in TEKO" << endl;
+                gameOver = true;
+            }
             isPlayer1 = (!isPlayer1);
         }
     }
@@ -129,6 +140,14 @@ private:
 
 public:
     ComputerVsUser() : human('X', "Human"), computer('O', "Computer") {}
+    bool CanWinInTheNextTurn(int col, char disc) {
+        Board tmpBoard= board;
+        if (tmpBoard.AddDisc(col, disc)) {
+            return tmpBoard.checkWin(disc);
+        }
+        return false;
+    }
+
 
     void Play() {
         bool humanTurn = true;
@@ -141,8 +160,29 @@ public:
                 cin >> col;
             }
             else {
-                col = rand() % cols;  
-                cout << "Computer chooses column: " << col << endl;
+                bool isOneMoveToWin = false;
+                for (int i = 0; i < cols; i++) {
+                    if (CanWinInTheNextTurn(i, computer.disc) ){
+                        col=i;
+                        cout << "the computer choose in the winning col " << col << endl;
+                        isOneMoveToWin=true;
+                        break;
+                    }
+                }
+                if (!isOneMoveToWin) {
+                    for (int i = 0; i < cols; i++) {
+                        if (CanWinInTheNextTurn(i, human.disc)) {
+                            col = i;
+                            cout << "the computer block the user from win and choose: " << col << endl;
+                            isOneMoveToWin = true;
+                            break;
+                        }
+                    }
+                }
+                if (!isOneMoveToWin) {
+                    col = rand() % cols;
+                    cout << "Computer chooses random column: " << col << endl;
+                }
             }
 
             Player& currentPlayer = humanTurn ? human : computer;
@@ -160,7 +200,11 @@ public:
                 cout << currentPlayer.name << " wins!" << endl;
                 gameOver = true;
             }
-
+            
+            if (board.isBoardFull()) {
+                cout << "the board is full, the game is finised in TEKO" << endl;
+                gameOver = true;
+            }
             humanTurn = !humanTurn;  
         }
     }
@@ -168,9 +212,10 @@ public:
 
 int main()
 {
-    /*TwoPlayersGame twoPlayerGame;
+    /*woPlayersGame twoPlayerGame;
     twoPlayerGame.Play();*/
     ComputerVsUser computerGame;
     computerGame.Play();
     return 0;
 }
+
