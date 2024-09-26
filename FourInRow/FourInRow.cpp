@@ -128,9 +128,7 @@ private:
     bool gameOver = false;
 
 public:
-    ComputerVsUser() : human('X', "Human"), computer('O', "Computer") {
-        srand(time(0));
-    }
+    ComputerVsUser() : human('X', "Human"), computer('O', "Computer") {}
 
     void Play() {
         bool humanTurn = true;
@@ -170,9 +168,9 @@ public:
 
 int main()
 {
-    TwoPlayersGame twoPlayerGame;
-    twoPlayerGame.Play();
-    /*ComputerVsUser computerGame;
-    computerGame.Play();*/
+    /*TwoPlayersGame twoPlayerGame;
+    twoPlayerGame.Play();*/
+    ComputerVsUser computerGame;
+    computerGame.Play();
     return 0;
 }
