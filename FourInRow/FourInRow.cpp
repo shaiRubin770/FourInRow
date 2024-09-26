@@ -1,6 +1,8 @@
 ﻿
 #include <iostream>
 #include<vector>
+#include <cstdlib>  
+#include <ctime>
 using namespace std;
 
 const int rows = 6;
@@ -83,42 +85,94 @@ public:
     }
 
 };
+class Player {
+public:
+    char disc;
+    string name;
+    Player(char disc,const string & name):disc(disc),name(name){}
+};
+class TwoPlayersGame {
+private:
+    Board board;
+    Player p1;
+    Player p2;
+    bool gameOver = false;
+public:
+    TwoPlayersGame():p1('X', "player1"), p2('O', "player2") {}
+    void Play() {
+        bool isPlayer1 = true;
+        while (!gameOver) {
+            board.printBoard();
+            int col;
+            Player& player= (isPlayer1) ? p1 : p2;
+            cout << player.name << " enter number of col from 0 to 6 :";
+            cin >> col;
+            if (col<0 || col>=cols|| !board.AddDisc(col, player.disc)) {
+                cout << " not good, try again" << endl;
+                continue;
+            }
+            if (board.checkWin(player.disc)) {
+                board.printBoard();
+                cout<< player.name<<" wins!";
+                gameOver=true;
+            }
+            isPlayer1 = (!isPlayer1);
+        }
+    }
+};
+class ComputerVsUser {
+private:
+    Board board;
+    Player human;
+    Player computer;
+    bool gameOver = false;
+
+public:
+    ComputerVsUser() : human('X', "Human"), computer('O', "Computer") {
+        srand(time(0));
+    }
+
+    void Play() {
+        bool humanTurn = true;
+        while (!gameOver) {
+            board.printBoard();
+            int col;
+
+            if (humanTurn) {
+                cout << human.name << " enter number of col from 0 to 6: ";
+                cin >> col;
+            }
+            else {
+                col = rand() % cols;  
+                cout << "Computer chooses column: " << col << endl;
+            }
+
+            Player& currentPlayer = humanTurn ? human : computer;
+
+            if (col < 0 || col >= cols || !board.AddDisc(col, currentPlayer.disc)) {
+                if (humanTurn) {
+                    cout << "Not a valid move, try again" << endl;
+                    continue;
+                }
+                continue;
+            }
+
+            if (board.checkWin(currentPlayer.disc)) {
+                board.printBoard();
+                cout << currentPlayer.name << " wins!" << endl;
+                gameOver = true;
+            }
+
+            humanTurn = !humanTurn;  
+        }
+    }
+};
+
 int main()
 {
-    Board* board = new Board();
-    bool gameOver = false;
-    int currentPlayer = 1;
-    int col;
-    char disc;
-    while (!gameOver) {
-        board->printBoard();
-        if (currentPlayer == 1) {
-            cout << "Player 1 (X), choose column (0-6): ";
-            disc = 'X';
-        }
-        else {
-            cout << "Player 2 (O), choose column (0-6): ";
-            disc = 'O';
-        }
-        cin >> col;
-        if (col < 0 || col >= cols) {
-            cout << " Please choose a valid column (0-6)." << endl;
-            continue;
-        }
-
-        if (!board->AddDisc(col, disc)) {
-            cout << "Column full. choose other column." << endl;
-            continue;
-        }
-
-        if (board->checkWin(disc)) {
-            board->printBoard(); 
-            cout << "Player " << currentPlayer << " wins!" << endl;
-            gameOver = true;
-        }
-            currentPlayer = (currentPlayer == 1) ? 2 : 1;
-        
-    }
-    delete board; 
+    TwoPlayersGame twoPlayerGame;
+    twoPlayerGame.Play();
+    /*ComputerVsUser computerGame;
+    computerGame.Play();*/
     return 0;
 }
